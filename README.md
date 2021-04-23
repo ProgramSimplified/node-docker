@@ -23,8 +23,19 @@
 
 - dev：docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d -V
 
+生产环境部署以及更新重启，都使用以下命令
+> 为什么要 --build 强制重新构建镜像呢？由于生产中没有像本地开发一样使用 volume，它都是通过 Dockfile 中 COPY . ./ 将代码置入容器 WORKDIR 中，所以构建镜像，代码的更新才会生效
 - prod：docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+--build 指定仅需要重新构建的镜像，这样比较好
+
+- prod：docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build node-app
+
+--no-deps 不对依赖的容器进行重启(up)，这是最好的方式 （node-app 依赖了 mongo）
+
+- prod：docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --no-deps node-app
 
 > 注意：-v 会删除所有 volume 数据，所以数据库数据会销毁
 - kill dev: docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v
 - kill prod: docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+
