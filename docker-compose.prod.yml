@@ -2,9 +2,9 @@
 version: "3"
 services:
   nginx:
-    # 生产环境下对外映射 80 端口了，docker-compose.yml 中默认为 3000
+    # 生产环境下对外映射 3008 端口了，docker-compose.yml 中默认为 3000
     ports:
-      - "80:80"
+      - "3008:80"
 
   node-app:
     build:
