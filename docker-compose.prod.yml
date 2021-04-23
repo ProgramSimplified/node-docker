@@ -13,7 +13,14 @@ services:
         NODE_ENV: production
     environment:
       - NODE_ENV=production
-      - MONGO_USER=yangyong
-      - MONGO_PASSWORD=mypassword
-      - SESSION_SECRET=mysecret
+      # （不推荐，逐个变量添加繁琐）以下通过在生产服务器 export MONGO_USER=”yangyong“ 设置 env，读取机器中 env。你可以在服务器通过 printenv 查看。
+      # （推荐）在生产服务器 /root 下新建 .env 文件加入你定义的变量（就像该仓库的根目录的.env），修改服务器 .profile或/etc/profile 文件，加入 set -o allexport; source /root/.env; sset +o allexport 这样就会通过文件来设置 env，读取机器中 env。你可以在服务器通过 printenv 查看。
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
     command: node index.js
+
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}

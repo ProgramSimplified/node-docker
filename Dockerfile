@@ -12,6 +12,6 @@ RUN if [ "$NODE_ENV" = "development" ]; \
 
 COPY . ./
 
-# 未指明 ARG 则为运行容器是传入的参数
+# 未指明 ARG 则为运行容器时传入的参数
 EXPOSE $PORT
 CMD ["node", "index.js"]

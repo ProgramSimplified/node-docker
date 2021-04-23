@@ -29,9 +29,6 @@ services:
     # 远程镜像
     image: mongo
     # 以下都为容器运行参数
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=yangyong
-      - MONGO_INITDB_ROOT_PASSWORD=mypassword
     # 由于每次重新 compose 会销毁重启容器，所以要保存数据库数据在本地
     volumes:
       # https://hub.docker.com/_/mongo Where to Store Data

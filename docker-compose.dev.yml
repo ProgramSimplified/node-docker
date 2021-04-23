@@ -19,3 +19,8 @@ services:
       - MONGO_PASSWORD=mypassword
       - SESSION_SECRET=mysecret
     command: npm run dev
+
+  mongo:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=yangyong
+      - MONGO_INITDB_ROOT_PASSWORD=mypassword
