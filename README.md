@@ -1,5 +1,7 @@
 # Node-Docker
 
+[YouTube](https://www.youtube.com/watch?app=desktop&v=jotpVtFwYBk)
+
 ## no compose
 
 1. docker build -t node-app-image .
@@ -120,3 +122,30 @@ $docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```bash
 $docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps node-app
 ```
+
+### 第三种方式
+
+**[watch tower](https://github.com/containrrr/watchtower)** 容器更新的另一种手段。
+
+watch tower 会监听镜像的更新，发现后自动进行 pull 镜像，并重启容器
+
+生产服务器执行：
+
+```bash
+$docker run -d --name watchtower -e WATCHTOWER_TRACE=true -e WATCHTOWER_DEBUG=true -e WATCHTOWER_POLL_INTERVAL=50 -v /va
+r/run/docker.sock:/var/run/docker.sock containrrr/watchtower <will be listen container name>
+```
+
+你可以更新下镜像尝试，在此之前，打开 watch tower 的日志
+
+-f | --follow
+
+```bash
+$docker logs watchtower -f
+```
+
+## Docker Swarm
+
+docker 集群
+
+youtube 视频后有讲解~~
