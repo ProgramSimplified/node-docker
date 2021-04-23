@@ -1,8 +1,48 @@
 version: "3"
 services:
-  node-app:
-    build: .
+  # 自定义的容器名称
+  nginx:
+    # 远程镜像
+    image: nginx:stable-alpine
+    # 以下都为容器运行参数
     ports:
-      - "3000:3000"
+      - "3000:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  # 自定义的容器名称
+  node-app:
+    # 本地构建镜像
+    build: .
+    # 以下都为容器运行参数
+    # node 应用 ngnix 代理，则不需要对外映射端口
+    # ports:
+    #   - "3000:3000"
     environment:
       - PORT=3000
+    # node 项目启动依赖 mongo，mongo 容器优先启动
+    depends_on:
+      - mongo
+
+  # 自定义的容器名称
+  mongo:
+    # 远程镜像
+    image: mongo
+    # 以下都为容器运行参数
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=yangyong
+      - MONGO_INITDB_ROOT_PASSWORD=mypassword
+    # 由于每次重新 compose 会销毁重启容器，所以要保存数据库数据在本地
+    volumes:
+      # https://hub.docker.com/_/mongo Where to Store Data
+      - mongo-db:/data/db
+
+  # 自定义的容器KEY名称
+  redis:
+    # 远程镜像
+    image: redis
+
+
+# compose down时，不要加 -v，否则会删除所有 volumes
+volumes:
+  mongo-db:

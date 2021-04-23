@@ -1,5 +1,10 @@
+# 开发环境的 compose 文件，merge into docker-compose.yml 文件
 version: "3"
 services:
+  nginx:
+    ports:
+      - "3000:80"
+
   node-app:
     build:
       context: .
@@ -10,4 +15,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - MONGO_USER=yangyong
+      - MONGO_PASSWORD=mypassword
+      - SESSION_SECRET=mysecret
     command: npm run dev
