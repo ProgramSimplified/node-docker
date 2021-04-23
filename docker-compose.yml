@@ -14,6 +14,9 @@ services:
   node-app:
     # 本地构建镜像
     build: .
+    # 远程镜像
+    image: angusyang9/node-app
+
     # 以下都为容器运行参数
     # node 应用 ngnix 代理，则不需要对外映射端口
     # ports:
