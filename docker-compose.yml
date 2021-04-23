@@ -14,7 +14,7 @@ services:
   node-app:
     # 本地构建镜像
     build: .
-    # 远程镜像
+    # 远程镜像 同时存在远程镜像和本地构建镜像，远程镜像生效
     image: angusyang9/node-app
 
     # 以下都为容器运行参数
