@@ -2,13 +2,13 @@
 
 [YouTube](https://www.youtube.com/watch?app=desktop&v=jotpVtFwYBk)
 
-## no compose
+## No Compose
 
 1. docker build -t node-app-image .
 2. docker run -v $(pwd):/app:ro -v /app/node_modules --env-file ./.env  -p 3000:4000 -d --name node-app  node-app-image
 3. docker exec -it node-app bash
 
-## compose
+## Docker Compose
 
 -d 后台执行，--build 会强制重新构建镜像
 
@@ -40,7 +40,7 @@ $docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d -V
 $docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v
 ```
 
-## Production deploy
+### 生产部署
 
 ### 第一种方式
 
@@ -95,9 +95,9 @@ $docker push angusyang9/node-app
 $docker-compose -f docker-compose.yml -f docker-compose.prod.yml build [service name]
 ```
 
-4. 发布镜像到 dockerhub
+4. 发布镜像到 docker hub
 
-这会检测到 compose yml 刚刚构建的镜像，并且 push
+依据 service name 找到对应镜像，然后 push
 
 ```bash
 $docker-compose -f docker-compose.yml -f docker-compose.prod.yml push [service name]
@@ -144,8 +144,107 @@ r/run/docker.sock:/var/run/docker.sock containrrr/watchtower <will be listen con
 $docker logs watchtower -f
 ```
 
-## Docker Swarm
+## Docker 服务集群
 
-docker 集群
+docker stack 可认为是单机上的负载均衡部署； 可认为是多节点（多服务器）集群部署 docker swarm 的特例。
 
-youtube 视频后有讲解~~
+Stack 依赖 Swarm 模式，应用 Stack 必须开启 Swarm 模式
+
+### docker compose 与 docker stack 对比：
+
+① 使用方式雷同：都使用yml 容器编排定义文件
+
+```bash
+$ docker-compose -f docker-compose up
+
+$ docker stack deploy -c docker-compose.yml <stack name>
+```
+
+② 作用大体相同： 两机制都能操纵 compose.yml 文件中定义的 services、volumes 、networks资源。
+
+> 另外由于docker swarm内置，所以可不需要安装 docker-compose 工具
+
+但是为什么会引入新的 docker stack 容器编排技术呢？ docker-compose 与 docker stack 除了语法，还有什么不同？
+
+举例如下：
+
+① docker stack 不支持 compose 文件中的“build”指令， 相比之下 docker-compose 可现场创建镜像，更适合**迭代开发、测试和 快速验证原型**
+
+② docker-compose 不支持 compose 版本3中 deploy 配置节(定义适用于生产部署的配置)， **这个 deploy 配置节专属于 docker stack**.
+
+> docker stack 强化了 service 的概念：服务可理解为发布到生产环境时某组容器的预期状态
+
+docker stack 不支持版本 2 规范编写的 compose.yml 文件，必须使用最新的 V3 版本。docker-compose 工具依然可以处理版本2，3（如上所述，会忽略掉不再适用于该工具的某些指令）。
+
+可以渐渐理解两者差异的趋势：
+
+- docker-compose 更像是被定义为单机容器编排工具；
+
+- docker stack 被定义为适用于生产环境的编排工具，强化了（ 复制集、 容器重启策略（滚动平滑重启）、回滚策略、服务更新策略 ）等生产特性。
+
+为什么 docker 公司要强化 docker stack， 因为 docker stack 是进阶 docker swarm 的必经之路，
+
+docker stack 可认为是单机上的负载均衡部署； 可认为是多节点（多服务）集群部署 docker swarm 的特例。
+
+> 画外音： 希望开发者上手 docker stack 用于生产部署，自然过渡到 docker swarm， 不然我跟 kubernetes 怎么竞争？
+
+所以：
+
+如果你仅需要一个能操作多个容器的工具，依旧可以使用 docker-compose 工具。
+
+因为 docker stack 几乎能做 docker-compose 所有的事情（生产部署 docker stack 表现还更好），如果你打算使用 docker swarm 集群编排，可尝试迁移到 docker stack。
+
+通过三种方式对比下图，可以发现，从体系结构上来讲，Stack 位于 Docker 应用层级的最顶端。Stack 基于服务进行构建，而服务又基于容器。
+
+[!img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/docker-stack.jpg)
+
+### stack 演示步骤
+
+通过以下命令可以查看 docker swarm 情况
+
+```bash
+$docker info
+```
+
+1. 开启 swarm 模式
+
+```bash
+$docker swarm init
+```
+
+2. 部署 stack
+
+```bash
+$docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml <stack name>
+```
+
+- 查看当前有哪些 stack 堆栈 `docker stack ls`
+- 查看 stack 所有服务 `docker stack services <stack name>`
+- 查看 stack 所有容器 `docker stack ps <stack name>`
+
+3. 更新 stack
+
+待应用镜像构建并上传至 docker hub 后
+
+```bash
+$docker-compose -f docker-compose.yml -f docker-compose.prod.yml build [service name]
+```
+```bash
+$docker-compose -f docker-compose.yml -f docker-compose.prod.yml push [service name]
+```
+
+在生产服务器更新 stack，与步骤 2 相同
+
+```bash
+$docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml <stack name>
+```
+
+通过 `docker stack ps <stack name>`，可以看到两个容器一组平滑重启来更新，时间间隔 15s（配置在 docker-compose.prod.yml）
+
+[!img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/stack-ps.jpg)
+
+4. 删除 stack
+
+```bash
+$docker stack rm myapp
+```
