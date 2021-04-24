@@ -196,7 +196,7 @@ docker stack 可认为是单机上的负载均衡部署； 可认为是多节点
 
 通过三种方式对比下图，可以发现，从体系结构上来讲，Stack 位于 Docker 应用层级的最顶端。Stack 基于服务进行构建，而服务又基于容器。
 
-[!img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/docker-stack.jpg)
+![img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/docker-stack.jpg)
 
 ### stack 演示步骤
 
@@ -241,10 +241,12 @@ $docker stack deploy -c docker-compose.yml -c docker-compose.prod.yml <stack nam
 
 通过 `docker stack ps <stack name>`，可以看到两个容器一组平滑重启来更新，时间间隔 15s（配置在 docker-compose.prod.yml）
 
-[!img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/stack-ps.jpg)
+![img](https://raw.githubusercontent.com/ProgramSimplified/node-docker/master/images/stack-ps.jpg)
 
 4. 删除 stack
 
 ```bash
 $docker stack rm myapp
 ```
+
+stack 参考：https://www.cnblogs.com/JulianHuang/p/11599170.html
