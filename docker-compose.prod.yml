@@ -7,7 +7,7 @@ services:
       - "3008:80"
 
   node-app:
-    depoly: # docker swarm 也就是容器集群相关，会被 docker-compose up | run 忽略；https://docs.docker.com/compose/compose-file/compose-file-v3/#deploy
+    deploy: # docker swarm 也就是容器集群相关，会被 docker-compose up | run 忽略；https://docs.docker.com/compose/compose-file/compose-file-v3/#deploy
       replicas: 8 # 容器副本数量
       restart_policy:
         condition: any
